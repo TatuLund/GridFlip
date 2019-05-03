@@ -1,7 +1,6 @@
 package org.vaadin.gridflip;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -26,18 +25,21 @@ import com.vaadin.ui.renderers.HtmlRenderer;
 @Theme("mytheme")
 public class MyUI extends UI {
 
-	
+	// This is a view with two Grids stacked, i.e. the other one
+	// is behind the other Grid. This is simplified example of the
+	// logic. 
 	public class FlipView extends VerticalLayout implements View {
         boolean grid1Front = true;
 
         public FlipView() {
-	        final Grid<HashMap<Integer, String>> grid1 = createGrid();
-	        final Grid<HashMap<Integer, String>> grid2 = createGrid();
+	        final Grid<List<String>> grid1 = createGrid();
+	        final Grid<List<String>> grid2 = createGrid();
 
-	        
+	        // Set custom styles
 	        grid1.addStyleName("grid-front");
 	        grid2.addStyleName("grid-back");
 	        
+	        // We just switching style names back and forth
 	        Button button = new Button("Flip grids");
 	        button.addClickListener(e -> {
 	        	if (grid1Front) {
@@ -65,10 +67,11 @@ public class MyUI extends UI {
 		}
 	}
 
+	// View with two Grids in tab sheet
 	public class TabsView extends VerticalLayout implements View {
 		public TabsView() {
-	        final Grid<HashMap<Integer, String>> grid1 = createGrid();
-	        final Grid<HashMap<Integer, String>> grid2 = createGrid();
+	        final Grid<List<String>> grid1 = createGrid();
+	        final Grid<List<String>> grid2 = createGrid();
 	        
 	        TabSheet tabSheet = new TabSheet();
 	        tabSheet.addTab(grid1,"Grid 1");
@@ -82,6 +85,7 @@ public class MyUI extends UI {
 	
     @Override
     protected void init(VaadinRequest vaadinRequest) {
+    	// Main view has menu and navigation
     	HorizontalLayout mainLayout = new HorizontalLayout();
     	VerticalLayout menuLayout = new VerticalLayout();
     	VerticalLayout layout = new VerticalLayout();
@@ -110,19 +114,26 @@ public class MyUI extends UI {
         setContent(mainLayout);
     }
 
-	private Grid<HashMap<Integer, String>> createGrid() {
-		final Grid<HashMap<Integer, String>> grid = new Grid<>();
+	private Grid<List<String>> createGrid() {
+		// Instead of usig bean, you can use List or HashMap for column values
+		// here we use integer value for column id, so List is the simplest case.
+		final Grid<List<String>> grid = new Grid<>();
         for (int i=0;i<52;i++) {
         	final int index = i;
-        	grid.addColumn(map -> map.get(index), new HtmlRenderer()).setCaption("W"+(i+1));
+        	// add column with value provider and renderer
+        	grid.addColumn(list -> list.get(index), new HtmlRenderer()).setCaption("W"+(i+1));
+        	// Additional tip: Complexity of determining column widths is O(nm) n = columns, m = rows in cache
+        	// If it is possible to set predefined width, Grid renders much faster since complex algorithm is
+        	// not run, try it
+        	// grid.addColumn(list -> list.get(index), new HtmlRenderer()).setWidth(100).setCaption("W"+(i+1));
         }
 
         Random random = new Random();
-        List<HashMap<Integer, String>> items = new ArrayList<>();
+        List<List<String>> items = new ArrayList<>();
         for (int j=0;j<1000;j++) {
-            final HashMap<Integer, String> values = new HashMap<>();
+            final List<String> values = new ArrayList<>();
         	for (int i=0;i<52;i++) {
-        		values.put(i, "<B>"+random.nextInt(10000)+VaadinIcons.EURO.getHtml()+"</B>");
+        		values.add(i, "<B>"+random.nextInt(10000)+VaadinIcons.EURO.getHtml()+"</B>");
         	}
         	items.add(values);
         }

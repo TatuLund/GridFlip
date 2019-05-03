@@ -34,11 +34,15 @@
 @mixin mytheme {
   @include valo;
 
+  // the grid behind has default z-index
+  // position: absolute forces the grids to 
+  // be placed in 0,0
   .grid-back {
   	position: absolute;
   	z-index: 0;
   }
 
+  // The grid on top has higher z-index
   .grid-front {
   	position: absolute;
   	z-index: 20;

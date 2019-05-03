@@ -1,8 +1,11 @@
 gridflip
 ==============
 
-Template for a simple Vaadin application that only requires a Servlet 3.0 container to run.
-
+This is demonstrator for the use case of fast switching between two Grids. Grid
+is slow to render. So the for example if the Grid is in Tabsheet and we switch 
+between the tabs, the view takes a while to update. However we can decide to
+pay the cost at once and render two Grids in same view and have a switcher 
+within the view between the Grids. This app shows how.
 
 Workflow
 ========
