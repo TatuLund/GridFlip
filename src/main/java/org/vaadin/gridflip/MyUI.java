@@ -17,6 +17,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.JavaScript;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -93,7 +95,6 @@ public class MyUI extends UI {
     	nav.addView("tabs", new TabsView());
     	nav.addView("flip", new FlipView());
     	nav.navigateTo("tabs");
-    	
         layout.setSizeFull();
         mainLayout.setSizeFull();
         menuLayout.setWidth("100px");
@@ -121,13 +122,39 @@ public class MyUI extends UI {
         for (int i=0;i<52;i++) {
         	final int index = i;
         	// add column with value provider and renderer
-        	grid.addColumn(list -> list.get(index), new HtmlRenderer()).setCaption("W"+(i+1));
+        	grid.addColumn(list -> list.get(index), new HtmlRenderer()).setId(""+i).setCaption("W"+(i+1));
         	// Additional tip: Complexity of determining column widths is O(nm) n = columns, m = rows in cache
         	// If it is possible to set predefined width, Grid renders much faster since complex algorithm is
         	// not run, try it
         	// grid.addColumn(list -> list.get(index), new HtmlRenderer()).setWidth(100).setCaption("W"+(i+1));
         }
 
+        // One approach to improve performnce of the large Grid view is to
+        // add drill down pattern. Here is simplified example of the idea, uncomment
+        // the code to see the effect
+//        grid.prependHeaderRow();
+//        for (int i=0;i<52;i++) {
+//        	if (i%4==0) {
+//        		final int index = i;
+//        		Button button = new Button("M"+i/4);
+//        		button.addClickListener(event -> {
+//        			if (!grid.getColumn(""+(index+1)).isHidden()) {
+//        				grid.getColumn(""+(index+1)).setHidden(true);
+//        				grid.getColumn(""+(index+2)).setHidden(true);
+//        				grid.getColumn(""+(index+3)).setHidden(true);        			
+//        			} else {        		
+//        				grid.getColumn(""+(index+1)).setHidden(false);
+//        				grid.getColumn(""+(index+2)).setHidden(false);
+//        				grid.getColumn(""+(index+3)).setHidden(false);
+//        			}
+//        		});
+//        		grid.getHeaderRow(0).getCell(""+i).setComponent(button);;
+//        	} else {
+//        		grid.getColumn(""+i).setHidden(true);        		
+//        	}
+//        }
+//        grid.setHeaderRowHeight(42);
+        
         Random random = new Random();
         List<List<String>> items = new ArrayList<>();
         for (int j=0;j<1000;j++) {
