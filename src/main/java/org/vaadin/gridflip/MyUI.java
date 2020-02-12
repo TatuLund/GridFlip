@@ -1,8 +1,9 @@
 package org.vaadin.gridflip;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import javax.servlet.annotation.WebServlet;
@@ -12,22 +13,21 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.Binder;
 import com.vaadin.data.Binder.Binding;
-import com.vaadin.icons.VaadinIcons;
+import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.JavaScript;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.renderers.HtmlRenderer;
+import com.vaadin.ui.Grid.SelectionMode;
 
 @Push
 @Theme("mytheme")
@@ -80,10 +80,26 @@ public class MyUI extends UI {
 		public TabsView() {
 	        final Grid<List<String>> grid1 = createGrid();
 	        final Grid<List<String>> grid2 = createGrid();
-	        
+//	        grid1.addAttachListener(event -> {
+//	        	System.out.println("GRID 1: Attached");
+//	        });
+//	        grid2.addAttachListener(event -> {
+//	        	System.out.println("GRID 2: Attached");
+//	        });
+	        	        	        
 	        TabSheet tabSheet = new TabSheet();
-	        tabSheet.addTab(grid1,"Grid 1");
+	        CssLayout layout1 = new CssLayout();
+	        tabSheet.addTab(grid1,"Grid 1");	        
 	        tabSheet.addTab(grid2,"Grid 2");
+//	        tabSheet.addSelectedTabChangeListener(event -> {
+//	        	CssLayout layout = (CssLayout) tabSheet.getSelectedTab();
+//	        	layout.removeAllComponents();
+//	        	if (layout == layout1) {
+//	        		layout.addComponent(grid1);
+//	        	} else {
+//	        		layout.addComponent(grid2);	        		
+//	        	}
+//	        });
 	        tabSheet.setSizeFull();
 	   
 	        addComponents(tabSheet);
@@ -158,6 +174,7 @@ public class MyUI extends UI {
         		final int index = i;
         		Button button = new Button("M"+i/5);
         		button.addClickListener(event -> {
+        			if (grid.getEditor().isOpen()) return;
         			if (!grid.getColumn(""+(index+1)).isHidden()) {
         				grid.getColumn(""+(index+1)).setHidden(true);
         				grid.getColumn(""+(index+2)).setHidden(true);
@@ -191,16 +208,43 @@ public class MyUI extends UI {
         			sum = sum + number;
         		}
         	}
-            
+            values.add(j+"");
         	items.add(values);
         }
-        grid.setItems(items);
+        
+        MyDataProvider<List<String>> dp = new MyDataProvider<>(items);
+        grid.setDataProvider(dp);
+        
         grid.setWidth("1200px");
         grid.setHeight("700px");
-
+        grid.setSelectionMode(SelectionMode.NONE);
+        grid.setHeightMode(HeightMode.ROW);
+        grid.setHeightByRows(100);
+        
 		return grid;
 	}
 
+	private class MyDataProvider<T> extends ListDataProvider<T> {
+
+		public MyDataProvider(Collection<T> items) {
+			super(items);
+		}
+
+		@Override
+	    public String getId(T item) {
+	        Objects.requireNonNull(item, "Cannot provide an id for a null item.");
+	        if (item instanceof List<?>) {
+	        	if (((List) item).size() == 67)
+	        		return ((List) item).get(66).toString();
+	        	else
+	        		return item.toString();
+	        } else {
+	        	return item.toString();
+	        }
+	    }
+		
+	}
+	
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
     public static class MyUIServlet extends VaadinServlet {
