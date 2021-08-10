@@ -154,9 +154,33 @@ public class MyUI extends UI {
         	TextField textField = new TextField();
         	Binding<List<String>, String> binding = binder.forField(textField).bind(list -> list.get(index), (list, value) -> list.set(index, value));
         	if ((i % 5) == 0) {
-        		grid.addColumn(list -> list.get(index)).setId(""+i).setCaption("M"+(i/5)).setEditorBinding(binding).setEditable(true);
+        		grid.addColumn(list -> list.get(index))
+        			.setId(""+i)
+        			.setCaption("M"+(i/5))
+        			.setEditorBinding(binding)
+        			.setStyleGenerator(list -> {
+        				if (Integer.valueOf(list.get(index)) > 29999) {
+        					return "red";
+        				} else if (Integer.valueOf(list.get(index)) < 10000) {
+        					return "green";
+        				}
+        				return null;
+        			})
+        			.setEditable(true);
         	} else {
-        		grid.addColumn(list -> list.get(index)).setId(""+i).setCaption("W"+(week)).setEditorBinding(binding).setEditable(true);
+        		grid.addColumn(list -> list.get(index))
+        			.setId(""+i)
+        			.setCaption("W"+(week))
+        			.setEditorBinding(binding)
+        			.setStyleGenerator(list -> {
+        				if (Integer.valueOf(list.get(index)) > 7499) {
+        					return "red";
+        				} else if (Integer.valueOf(list.get(index)) < 2500) {
+        					return "green";
+        				}
+        				return null;
+        			})
+        			.setEditable(true);
         		week++;
         	}
         	// Additional tip: Complexity of determining column widths is O(nm) n = columns, m = rows in cache
@@ -211,7 +235,7 @@ public class MyUI extends UI {
             values.add(j+"");
         	items.add(values);
         }
-        
+
         MyDataProvider<List<String>> dp = new MyDataProvider<>(items);
         grid.setDataProvider(dp);
         

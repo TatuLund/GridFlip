@@ -47,4 +47,18 @@
   	position: absolute;
   	z-index: 20;
   }
+ 
+  .red {
+  	color: red;
+  }
+ 
+  .green {
+  	color: green;
+  }
+ 
+	.v-grid-cell {
+		display: inline-block !important;
+		float: inherit !important;
+	}
+
 }
